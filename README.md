@@ -1,5 +1,5 @@
 # Advanced-bioreactor
-the components and codes were built for an algae cultivation vessel using inorganic carbon (CO2), and light energy (from LED for the Sun), but the principle works for other systems, e.g. indoor plantation, other microbial culvation systems.
+the components and codes were built for an algae cultivation vessel using inorganic carbon (CO2), and light energy (from LED or the Sun), but the principle works for other systems, e.g. indoor plantation, other microbial culvation systems.
 
 ## I. The following components are hosted here:
 - high powered LED control that mimicking a pre-defined solar pattern for one day. More details on instructables.com: https://www.instructables.com/id/Control-High-powered-LED-Panel-by-Arduino-Real-Tim/
