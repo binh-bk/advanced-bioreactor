@@ -24,4 +24,4 @@ the components and codes were built for an algae cultivation vessel using inorga
 </p>
 
 ----
-Arduino code for pH, temperature monitoring, data logger, turbiostat, control LED for mimicking sun pattern
+Arduino code for pH, temperature monitoring, data logger, turbiostat, control LED for mimicking a solar pattern
