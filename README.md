@@ -8,7 +8,7 @@ the components and codes were built for an algae cultivation vessel using inorga
 - data logger for pH, DO, and temperature, timestamp. More details here: https://www.instructables.com/id/How-to-Make-a-Data-Logger-for-the-Temperature-PH-a/
 - a turbidity monitoring and control using infra-red sensor, applied to measure and control algal biomass density. Link to a journal publication: https://www.sciencedirect.com/science/article/pii/S2211926417307683
 the 1st code dated _0726, and the cleanup version dated _2018.
-
+- alternative approach: turbidity (biomass density) monitoring and control, data logged via USB cable to the laptop or Raspberry Pi by a Python script. No need YunShield as the above approach.
 ## II. Schematic of each module:
 ### 1. LED Control and Lux Measurement
 
@@ -25,6 +25,11 @@ the 1st code dated _0726, and the cleanup version dated _2018.
 ### 3.  Turbidity monitoring and control
 <p align="center">
   <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/Turbidity_logdata_YunShield_0726/turbidostat.png"/>
+</p>
+
+### 4. Turbidity and logging data via USB cable
+<p align="center">
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/Turbidity_log_python/simpleTurbidostat.jpg"/>
 </p>
 
 ----
