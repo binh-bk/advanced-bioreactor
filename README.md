@@ -12,18 +12,18 @@ the components and codes were built for an algae cultivation vessel using inorga
 ### 1. LED Control and Lux Measurement
 
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/LED%20control.jpg"/>
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/LED_Control_0513/LED%20control.jpg"/>
 </p>
 
 ### 2.  Data Logger
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/data%20logger_pH_temp_DO.jpg"/>
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/Logging_ph_DO_temp_sentdata_I2C_0426/data%20logger_pH_temp_DO.jpg"/>
 </p>
 
 
 ### 3.  Turbidity monitoring and control
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/turbidostat.png"/>
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/Turbidity_logdata_YunShield_0726/turbidostat.png"/>
 </p>
 
 ----
