@@ -12,7 +12,7 @@ import serial, time, sys
 
 print("Press Ctrl+C to save and stop the logging")
 baud_rate = 115200  #  In arduino, Serial.begin(baud_rate), e.g. 115200
-default = "logfile.txt"
+default = time.strftime("log_%Y%m%d_%H%M.txt")
 serial_port = '/dev/ttyUSB0'  #  listening port, type ls /dev/ttyUSB* in shell for available ports
 if len(sys.argv) == 2:
     logfile_name = sys.argv[1]
@@ -22,6 +22,7 @@ else:
 output_file = open(logfile_name, "a+")
 output_file.write(time.strftime("%x\n"))
 ser = serial.Serial(serial_port, baud_rate)
+count = 0
 
 try:
     while True:
@@ -32,9 +33,15 @@ try:
         if line != "\n":
             print(timeNow, line)
             output_file.write(outputline)
+            count += 1
         else:
             continue
             #  print("\nnothing here")
+        if count >= 10:
+            output_file.close()
+            output_file = open(logfile_name, "a+")
+            count = 0
+            
 except KeyboardInterrupt:
     print(">> Ctrl+C pressed, stop logging to {} file".format(logfile_name))
     output_file.close()
