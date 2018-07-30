@@ -9,6 +9,7 @@ key assumptions:
 2. Growth model: Steele's (1977) with both the limitation and inhibition constant
 3. Instant and well mixed culture (from modeling standpoint)
 4. C, N, P, pH, temperature, vital minerals are not accounted in.
+**before run: install matplotlib by pip/pip3 install matplotlib
 '''
 
 import math
