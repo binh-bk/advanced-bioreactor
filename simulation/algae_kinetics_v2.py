@@ -17,12 +17,11 @@ import math
 EPSL = 0.15    # m3/m-g
 #IN_LI0 = 600    # uE/m2/s
 MAX_DEPTH = 5E-02   # 5cm
-INI_BIOMASS_CONC = 50  # g/m3 ~ mg/l
+INI_BIOMASS_CONC = 500  # g/m3 ~ mg/l
 K_LI = 30   # light intensity at a half umax
 K_IH = 300  # light intensity that inhibits a half umax
 U_MAX = 2.5  # maximum growth rate
 MNT_RATE = 0.10  # maintanance rate
-DURATION = 15    # day(s)
 STEPS_DAY = 1440    # iterations
 SOLAR_FILE = '/home/live/Desktop/helloPy/aPBR/z9398232.txt'  # absolute filepath to light profile
 
@@ -69,13 +68,11 @@ def x2List(key, input):
 def drawing(result):
     import matplotlib.pyplot as plt
     
-    x_axis = [i/60 for i in range(0, steps)]  # convert minutes to hours
-    
-    aili_list = x2List('aili', run)
-
-    li0_list = x2List('li0', run)
-    ur_list = x2List('ur', run)
-    cbm_list = x2List('cbm', run)
+    x_axis = [i/60 for i in range(0, steps)]  # convert minutes to hour
+    aili_list = x2List('aili', result)
+    li0_list = x2List('li0', result)
+    ur_list = x2List('ur', result)
+    cbm_list = x2List('cbm', result)
     
     bpr_list = list()
     for i in range(1, len(cbm_list)):
@@ -99,16 +96,17 @@ def drawing(result):
     ax2 = ax1.twinx()
     ax2.plot(x_axis, aili_list, 'b')
     ax2.set_ylabel('AILI', color='b')
-    # ax2.grid(color='grey', linestyle='-', linewidth=0.5, )
+    ax2.set_ylim(0, max(aili_list)*1.2)
 
     ax3 = plt.subplot(4, 1, 2)
     ax3.plot(x_axis, ur_list, color='green')
+    Y3_MAX = max(ur_list)
     ax3.set_ylabel('net growth rate')
     ax3.grid(color='grey', linestyle='-', linewidth=0.5, )
-    ax3.text(0.01, 0.8, "K_LI: {}".format(K_LI), {'color':'b', 'fontsize':10})
-    ax3.text(0.01, 0.6, "K_IH: {}".format(K_IH), {'color':'b', 'fontsize':10})
-    ax3.text(0.01, 0.4, "u_max: {}".format(U_MAX), {'color':'b', 'fontsize':10})
-    ax3.text(0.01, 0.2, "u_mnt: {}".format(MNT_RATE), {'color':'b', 'fontsize':10})
+    ax3.text(0.01, 0.7*Y3_MAX, "K_LI: {}".format(K_LI), {'color':'b', 'fontsize':10})
+    ax3.text(0.01, 0.5*Y3_MAX, "K_IH: {}".format(K_IH), {'color':'b', 'fontsize':10})
+    ax3.text(0.01, 0.3*Y3_MAX, "u_max: {}".format(U_MAX), {'color':'b', 'fontsize':10})
+    ax3.text(0.01, 0.1*Y3_MAX, "u_mnt: {}".format(MNT_RATE), {'color':'b', 'fontsize':10})
     
     ax4 = plt.subplot(4, 1, 3)
     ax4.plot(x_axis, cbm_list, color='black')
