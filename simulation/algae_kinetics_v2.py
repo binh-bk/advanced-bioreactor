@@ -9,6 +9,7 @@ key assumptions:
 2. Growth model: Steele's (1977) with both the limitation and inhibition constant
 3. Instant and well mixed culture (from modeling standpoint)
 4. C, N, P, pH, temperature, vital minerals are not accounted in.
+**before run: install matplotlib by pip/pip3 install matplotlib
 '''
 
 import math
@@ -23,7 +24,7 @@ K_IH = 300  # light intensity that inhibits a half umax
 U_MAX = 2.5  # maximum growth rate
 MNT_RATE = 0.10  # maintanance rate
 STEPS_DAY = 1440    # iterations
-SOLAR_FILE = '/home/live/Desktop/helloPy/aPBR/z9398232.txt'  # absolute filepath to light profile
+SOLAR_FILE = '/absolute/path/to/lightprofile/z9398232.txt'  # absolute filepath to light profile
 
 def getLightProfile(steps, filename=SOLAR_FILE):
     light_profile = list()
