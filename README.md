@@ -36,7 +36,7 @@ the 1st code dated _0726, and the cleanup version dated _2018.
 ### 5. Simulation of algae growing batch
 Below are two-day simulation, running ~2880 steps in 0.01 secs
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/2days.png"/>
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/1%20day.png"/>
 </p>
 =======
 Arduino code for pH, temperature monitoring, data logger, turbiostat, control LED for mimicking a solar pattern
