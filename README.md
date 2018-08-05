@@ -47,7 +47,7 @@ Below are two-day simulation, running ~2880 steps in 0.01 secs
 - Require: matplotlib to generate graphic
 - Use:
 + Open the input.csv file, change the kinetic parameters as you like, update the folder to store the graphic if you select to save, the mode of simulation either growth 'batch' or 'turbido' 
-+ In terminal: python3 runfile.py input.csv
++ In terminal: '''python3 runfile.py input.csv'''
 + A self-generated .csv file stores the biomass productivivity (g/m2-day)
 
 =======
