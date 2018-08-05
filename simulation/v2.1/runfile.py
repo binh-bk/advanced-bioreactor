@@ -5,7 +5,7 @@ A simulation using Python3 to model algal biomass production:
 input: using solar profile from Phoenix, AZ, USA
 constant: marked as UPPER_CASE below
 key assumptions:
-1. Light intensity: calculated as the volume average based the Beer-Lambert Law
+1. Light intensity: calculated as the volume average based on the Beer-Lambert Law
 2. Growth model: Aiba's (1982) with both the limitation and inhibition constant
 3. Instant and well mixed culture (from modeling standpoint)
 4. C, N, P, pH, temperature, vital minerals are not accounted in.
@@ -40,7 +40,9 @@ def get_input(inputfile):
     return setups   
 
 def assign_input(input_):
-    global EPSL, MAX_DEPTH, INI_BIOMASS_CONC, SET_BIOMASS_C, K_IH, K_LI, U_MAX, MNT_RATE, SOLAR_FILE, IMG_FILE, SPECIFIC_AREA, DURATION, MODE, GRAPHFLAG, SEASON
+    '''assign the value to global variants'''
+    global EPSL, MAX_DEPTH, INI_BIOMASS_CONC, SET_BIOMASS_C, K_IH, K_LI, \
+    U_MAX, MNT_RATE, SOLAR_FILE, IMG_FILE, SPECIFIC_AREA, DURATION, MODE, GRAPHFLAG, SEASON
     if input_['solar_profile'] == 'winter':
         SOLAR_FILE = 'z3286089.txt' 
         SEASON = 'w' 
@@ -67,6 +69,7 @@ def assign_input(input_):
 
 
 def datestamp():
+    '''return a unique stamp for naming the graph output'''
     date_ = time.strftime('%Y%m%d', time.localtime())
     specs = '.'.join([SEASON, str(INI_BIOMASS_CONC), str(MAX_DEPTH), str(EPSL),'png'])
     f_name = '-'.join([date_, specs])
@@ -106,6 +109,7 @@ def growthRate(aili, *args, **kwargs):
     return U_MAX*aili/(aili+K_LI + aili**2/K_IH)
 
 def netGrowthRate(grossGrowthrate, growthmode, biomass):
+    '''return dilution, and growth rate based the the growth mode '''
     if growthmode == 'batch':
         dilution_rate = 0
         net_rate = grossGrowthrate - MNT_RATE
@@ -120,9 +124,8 @@ def netGrowthRate(grossGrowthrate, growthmode, biomass):
             else:
                 dilution_rate = grossGrowthrate - MNT_RATE
                 net_rate = 0
-            # net to put some safeguard here.
+            # need to put some safeguard here.
     return net_rate, dilution_rate
-
 
 def biomassConc(biomassC, net_rate, delta_t):
     '''return biomass concentration, growthrate = net growth rate'''
@@ -178,7 +181,8 @@ def drawing(result):
     bpr_m2, bpr_l_day = biomass_productivity(result)
 
     f = plt.figure(figsize=(10,8))
-    f.suptitle("Simulation: Microalgae with PHX solar profile\n X0: {},mg/l, depth={},m, K_IH: {}uE/m2-s".format(INI_BIOMASS_CONC, MAX_DEPTH, K_IH), fontsize=12, )
+    f.suptitle("Simulation: Microalgae with PHX solar profile\n X0: {},mg/l, depth={},m,\
+                K_IH: {}uE/m2-s".format(INI_BIOMASS_CONC, MAX_DEPTH, K_IH), fontsize=12, )
 
     ax1 = f.add_subplot(4,1,1)
     ax1.plot(x_axis, li0_list,  'r')
@@ -191,7 +195,6 @@ def drawing(result):
     ax1.text(-2, Y1_MAX*0.6, "PBR_D,m: {}".format(MAX_DEPTH), {'color':'#0b267a', 'fontsize':10})
     ax1.text(-2, Y1_MAX*0.4, "epsilon: {}".format(EPSL), {'color':'#0b267a', 'fontsize':10})
     ax1.text(-2, Y1_MAX*0.2, "light: {}".format(getdate(SOLAR_FILE)), {'color':'#0b267a', 'fontsize':10})
-
 
     ax2 = ax1.twinx()
     ax2.plot(x_axis, aili_list, 'b',)
@@ -276,8 +279,9 @@ def simulating(light_profile, steps):
     return result
 
 def save_output(outputs):
-
-    fieldnames = ['set#', 'solar_profile', 'max_depth', 'epsl', 'u_max','u_mnt', 'k_li','k_ih','ini_biomass','mode','graph_save','graph_output','steps_day','duration', 'day1','day2']
+    '''return the output by appending the biomass productivity and the input'''
+    fieldnames = ['set#', 'solar_profile', 'max_depth', 'epsl', 'u_max','u_mnt', 'k_li','k_ih','ini_biomass','mode',\
+                  'graph_save','graph_output','steps_day','duration', 'day1','day2']
     with open('output.csv', 'a') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -290,6 +294,7 @@ def save_output(outputs):
 @logtime.memory_usage_psutil
 @logtime.my_timer
 def main():
+    '''main program'''
     
     steps = int(DURATION*STEPS_DAY)
     light_profile = getLightProfile(steps,filename=SOLAR_FILE)
