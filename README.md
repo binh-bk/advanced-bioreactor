@@ -53,6 +53,7 @@ Below are two-day simulation, running ~2880 steps in 0.01 secs
 <p align="center">
   <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v2.1/v2.1_025.png"/>
 </p>
+
 #### An example of the graph output
 <p align="center">
   <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v2.1/20180805-w.500.0.05.0.3.png"/>
