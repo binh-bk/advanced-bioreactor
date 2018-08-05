@@ -1,0 +1,4 @@
+set#,solar_profile,epsl,max_depth,k_li,k_ih,u_max,u_mnt,ini_biomass,steps_day,duration,graph_save,mode,graph_output
+1,winter,0.15,0.01,30,300,2.5,0.1,250,1440,2,TRUE,turbido,/home/live/Desktop/simulation/
+2,winter,0.15,0.01,30,300,2.5,0.1,500,1440,2,TRUE,batch,/home/live/Desktop/simulation/
+3,winter,0.3,0.05,30,100,2.5,0.15,500,1440,2,TRUE,batch,/home/live/Desktop/simulation/
