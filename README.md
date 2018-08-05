@@ -49,6 +49,14 @@ Below are two-day simulation, running ~2880 steps in 0.01 secs
     + Open the input.csv file, change the kinetic parameters as you like, update the folder to store the graphic if you select to save, the mode of simulation either growth 'batch' or 'turbido' 
     + In terminal: ```python3 runfile.py input.csv```
     + A self-generated .csv file stores the biomass productivivity (g/m2-day)
+#### Print out in the terminal
+<p align="center">
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v2.1/v2.1_025.png"/>
+</p>
+#### An example of the graph output
+<p align="center">
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v2.1/20180805-w.500.0.05.0.3.png"/>
+</p>
 
 =======
 Arduino code for pH, temperature monitoring, data logger, turbiostat, control LED for mimicking a solar pattern
