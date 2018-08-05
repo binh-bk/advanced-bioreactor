@@ -34,10 +34,22 @@ the 1st code dated _0726, and the cleanup version dated _2018.
 </p>
 
 ### 5. Simulation of algae growing batch
+#### Noted as v1.0 inside the //simulation// folder
 Below are two-day simulation, running ~2880 steps in 0.01 secs
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/1%20day.png"/>
+  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v1.0/3%20days%2C%20high%20X.png"/>
 </p>
+
+### 6. Complete simulation of microalgae growth:
+- Using .csv file to set up the input profile, besides a default one when no .csv provided,
+- The output is saved to .csv file with the input profile and the biomass productivity 
+- Graph generated is optional, can be selected using the input.csv
+- Require: matplotlib to generate graphic
+- Use:
++ Open the input.csv file, change the kinetic parameters as you like, update the folder to store the graphic if you select to save, the mode of simulation either growth 'batch' or 'turbido' 
++ In terminal: python3 runfile.py input.csv
++ A self-generated .csv file stores the biomass productivivity (g/m2-day)
+
 =======
 Arduino code for pH, temperature monitoring, data logger, turbiostat, control LED for mimicking a solar pattern
 
