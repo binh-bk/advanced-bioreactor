@@ -4,10 +4,9 @@ the components and codes were built for an algae cultivation vessel using inorga
 
 ## I. The following components are hosted here:
 
-- high powered LED control that mimicking a pre-defined solar pattern for one day. More details on instructables.com: https://www.instructables.com/id/Control-High-powered-LED-Panel-by-Arduino-Real-Tim/
-- data logger for pH, DO, and temperature, timestamp. More details here: https://www.instructables.com/id/How-to-Make-a-Data-Logger-for-the-Temperature-PH-a/
-- a turbidity monitoring and control using infra-red sensor, applied to measure and control algal biomass density. Link to a journal publication: https://www.sciencedirect.com/science/article/pii/S2211926417307683
-the 1st code dated 0726, and the cleanup version dated 2018.
+- high powered LED control that mimicking a pre-defined solar pattern for one day. <a href='https://www.instructables.com/id/Control-High-powered-LED-Panel-by-Arduino-Real-Tim/'>More details on instructables.com</a>
+- data logger for pH, DO, and temperature, timestamp. <a href='https://www.instructables.com/id/How-to-Make-a-Data-Logger-for-the-Temperature-PH-a/'>More details here</a> 
+- a turbidity monitoring and control using infra-red sensor, applied to measure and control algal biomass density. <a href='https://www.sciencedirect.com/science/article/pii/S2211926417307683'>Link to a journal publication on Sciencedirect.com </a>.  The 1st version dated 0726, and the cleanup version dated 2018.
 - alternative approach: turbidity (biomass density) monitoring and control, data logged via USB cable to the laptop or Raspberry Pi by a Python script. No need YunShield as the above approach.
 - simulation using Python3 for the algae growth in the _batch_ or _turbidity_ mode.
 ## II. Schematic of each module:
