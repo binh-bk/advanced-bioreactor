@@ -21,10 +21,7 @@ char logFileName[] = "dataLT.txt";                                       // modi
 long id = 1;                                                            //the id number to enter the log order
 
 
-//#include <LCD.h>;             //LCD Display 20x4
-//#include <LiquidCrystal.h>
 #include <LiquidCrystal_I2C.h>
-//LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 #include <OneWire.h>
@@ -33,7 +30,6 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 DeviceAddress ProbeP = { 0x28, 0xC2, 0xE8, 0x37, 0x07, 0x00, 0x00, 0xBF };
-
 
 String dataString;              // the main variant to store all data
 String dataString2;             // a temporary variant to store Temperature/pH/DO for print out
@@ -47,262 +43,168 @@ byte in_char=0;                  //used as a 1 byte buffer to store in bound byt
 byte i=0;                        //counter used for ph_data array. 
 int time_=1800;                   //used to change the delay needed depending on the command sent to the EZO Class pH Circuit. 
 float pH_float;                  //float var used to hold the float value of the pH. 
-
 char DO_data[20];
 
-//float temp_C;
+void setup(){
+  Serial.begin(9600);           //enable serial port.  
+  Wire.begin(99);                 //enable I2C port.
+  Wire.begin(97);
 
+  lcd.init();
+  lcd.begin(20,4);
 
-void setup()                    //hardware initialization.                
-    {
-      Serial.begin(9600);           //enable serial port.  
-      Wire.begin(99);                 //enable I2C port.
-      Wire.begin(97);
-         
-      lcd.init();
-      lcd.begin(20,4);
-      
-      lcd.backlight();
-      lcd.home();
-      lcd.print("Hello PBR!");
-      lcd.setCursor(0,1);
-      lcd.print("Initializing...");
-      
-      Serial.print("RTC is...");   
-      if (! rtc.begin())
-          { 
-           Serial.println("RTC:  Real-time clock...NOT FOUND");
-           while (1);// (Serial.println("RTC:  Real-time clock...FOUND"));
-          }
-       Serial.println("RUNNING");
+  lcd.backlight();
+  lcd.home();
+  lcd.print("Hello PBR!");
+  lcd.setCursor(0,1);
+  lcd.print("Initializing...");
 
-       
-       Serial.print("Real-time Clock...");
-       if (! rtc.isrunning())
-            {rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-            }
-       Serial.println("WORKING");
-       
-       lcd.setCursor(0,0);
-       lcd.println("RTC: OK");
+  Serial.print("RTC is...");   
+  if (! rtc.begin()){ 
+       Serial.println("RTC:  Real-time clock...NOT FOUND");
+       while (1);// (Serial.println("RTC:  Real-time clock...FOUND"));
+      }
+   Serial.println("RUNNING");
 
+   Serial.print("Real-time Clock...");
+   if (! rtc.isrunning()){
+       rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+       }
+   Serial.println("WORKING");
+   lcd.setCursor(0,0);
+   lcd.println("RTC: OK");
+    
+  Serial.print("SD card...");                                 // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) 
+      {  Serial.println("Failed");                          // don't do anything more:
+         return;
+      }
+  Serial.println("OK");
+   lcd.setCursor(0,1);
+   lcd.println("SD card: OK");  
 
-      Serial.print("SD card...");                                 // see if the card is present and can be initialized:
-      if (!SD.begin(chipSelect)) 
-          {  Serial.println("Failed");                          // don't do anything more:
-             return;
-          }
-      Serial.println("OK");
-
-       lcd.setCursor(0,1);
-       lcd.println("SD card: OK");  
-  
-       Serial.print("Log File: ");
-       Serial.print(logFileName);
-       Serial.print("...");
-       File logFile = SD.open(logFileName, FILE_WRITE);   // open the file. "datalog" and print the header
-        if (logFile)
-          {
-            logFile.println(", , , , , ,");                       //indicate there were data in the previous run
-            String header = "ID, Date, Time, Turbidity, Temp(C), pH, DO";
-            logFile.println(header);
-            logFile.close();
-            Serial.println("READY");
-            //Serial.println(dataString);   // print to the serial port too:
-          }
-      else { Serial.println("error opening datalog"); }  // if the file isn't open, pop up an error:
-       
-       lcd.setCursor(0,2);
-       lcd.print("Log file:");
-       lcd.println(logFileName);      
+   Serial.print("Log File: ");
+   Serial.print(logFileName);
+   Serial.print("...");
+   File logFile = SD.open(logFileName, FILE_WRITE);   // open the file. "datalog" and print the header
+    if (logFile){
+        logFile.println(", , , , , ,");                       //indicate there were data in the previous run
+        String header = "ID, Date, Time, Turbidity, Temp(C), pH, DO";
+        logFile.println(header);
+        logFile.close();
+        Serial.println("READY");
+        //Serial.println(dataString);   // print to the serial port too:
+      }
+  else { Serial.println("error opening datalog"); }  // if the file isn't open, pop up an error:
+   lcd.setCursor(0,2);
+   lcd.print("Log file:");
+   lcd.println(logFileName);      
+     
+  delay(1000);
+  sensors.begin();
+  sensors.setResolution(ProbeP, 10);
+  lcd.clear();
+  id = 0;
+  }
         
-      
-      delay(1000);
-      
-      sensors.begin();
-      sensors.setResolution(ProbeP, 10);
+void loop(){                    //the main loop.
+  dataString = String(id);
+  dataString = String(',');
+  DateTime now = rtc.now();
+  dataString = String(now.year(), DEC);
+  dataString += String('/');
+  dataString +=  String(now.month(), DEC);
+  dataString += String('/');
+  dataString += String(now.day(), DEC);
+  dataString += String(' ');
+  dataString += String(now.hour(), DEC);
+  dataString += String(':');
+  dataString += String(now.minute(), DEC);
+  dataString += String(':');
+  dataString += String(now.second(), DEC);
+  lcd.home();
+  lcd.print(dataString);
+  sensors.requestTemperatures();
+  displayTemperature(ProbeP);
+            
+  Wire.beginTransmission(pH_address); //call the circuit by its ID number.  
+  Wire.write('r');                 //hard code r to read
+  Wire.endTransmission();          //end the I2C data transmission.    
+  delay(time_);                    //wait the correct amount of time for the circuit to complete its instruction. 
+  Wire.requestFrom(pH_address,20,1); //call the circuit and request 20 bytes (this may be more than we ne
 
-      lcd.clear();
-      id = 0;
+  while(Wire.available()){
+      in_char = Wire.read();           //receive a byte.
+     //Serial.println(in_char);
+     if ((in_char > 31) && (in_char <127)){ //check if the char is usable (printable)
+       pH_data[i]= in_char;             //load this byte into our array.
+       i+=1; 
+        }                           
+     if(in_char==0){                 //if we see that we have been sent a null command.     
+        i=0;                        //reset the counter i to 0.
+        Wire.endTransmission();     //end the I2C data transmission.
+        break;                      //exit the while loop.
+          }
     }
-
-
-/*
-void serialEvent()
-            {            //this interrupt will trigger when the data coming from the serial monitor(pc/mac/other) is received.    
-              received_from_computer=Serial.readBytesUntil(13,computerdata,20); //we read the data sent from the serial monitor(pc/mac/other) until we see a <CR>. 
-                                                                                  //We also count how many characters have been received.      
-              computerdata[received_from_computer]=0;  //stop the buffer from transmitting leftovers or garbage.
-              serial_event=1;
-           } 
-           */   
-        
-void loop()
-        {                    //the main loop.
-          dataString = String(id);
-          dataString = String(',');
-          
-          DateTime now = rtc.now();
-         
-          dataString = String(now.year(), DEC);
-          dataString += String('/');
-          dataString +=  String(now.month(), DEC);
-          dataString += String('/');
-          dataString += String(now.day(), DEC);
-          dataString += String(' ');
-          dataString += String(now.hour(), DEC);
-          dataString += String(':');
-          dataString += String(now.minute(), DEC);
-          dataString += String(':');
-          dataString += String(now.second(), DEC);
-          lcd.home();
-          lcd.print(dataString);
-
-          sensors.requestTemperatures();
-          displayTemperature(ProbeP);
-            //float tempC;
-            //dataString = String(tempC);          
-            //if(serial_event)
-            // {            //if the serial_event=1.
-                //if(computerdata[0]=='c')||computerdata[0]=='r')time_=1800; //if a command has been sent to calibrate or take a reading we wait 1800ms so that the circuit has time to take the reading.  
-                //else time_=300;         //if any other command has been sent we wait only 300ms.
-             
-            
-          Wire.beginTransmission(pH_address); //call the circuit by its ID number.  
-          //Wire.write(computerdata);        //transmit the command that was sent through the serial port.
-         // Wire.write('T, tempC');                 //hard code r to read
-          Wire.write('r');                 //hard code r to read
-          Wire.endTransmission();          //end the I2C data transmission.    
-          delay(time_);                    //wait the correct amount of time for the circuit to complete its instruction. 
-          Wire.requestFrom(pH_address,20,1); //call the circuit and request 20 bytes (this may be more than we need)
-          //code=Wire.read();               //the first byte is the response code, we read this separately.  
-               
-               /*
-                switch (code)
-                        {                  //switch case based on what the response code is.  
-                        case 1:                       //decimal 1.  
-                          Serial.println("Success");  //means the command was successful.
-                        break;                        //exits the switch case.
-                        case 2:                        //decimal 2. 
-                         Serial.println("Failed");    //means the command has failed.
-                       break;                         //exits the switch case.
-                       case 254:                      //decimal 254.
-                         Serial.println("Pending");   //means the command has not yet been finished calculating.
-                       break;                         //exits the switch case.
-                       case 255:                      //decimal 255.
-                         Serial.println("No Data");   //means there is no further data to send.
-                       break;                         //exits the switch case.
-                    }
-                    */
-                 while(Wire.available())                //are there bytes to receive.  
-                          { 
-                             in_char = Wire.read();           //receive a byte.
-                             //Serial.println(in_char);
-                             if ((in_char > 31) && (in_char <127))  //check if the char is usable (printable)
-                             {
-                                   pH_data[i]= in_char;             //load this byte into our array.
-                                   i+=1; 
-                             }                           
-                             if(in_char==0)                  //if we see that we have been sent a null command. 
-                                  {        
-                                    i=0;                        //reset the counter i to 0.
-                                    Wire.endTransmission();     //end the I2C data transmission.
-                                    break;                      //exit the while loop.
-                                  }
-                          }
-
-           serial_event=0;                                 //reset the serial event flag.
-           dataString2 += ",";
-
-           dataString2 += String(pH_data);
-
-           Wire.beginTransmission(DO_address);             //call the circuit by its ID number.  
-           Wire.write('r');
-           //Wire.write(computerdata);                    //transmit the command that was sent through the serial port.
-           Wire.endTransmission();                         //end the I2C data transmission. 
-              
-           delay(time_);                                   //wait the correct amount of time for the circuit to complete its instruction. 
     
-           Wire.requestFrom(DO_address,20,1);              //call the circuit and request 20 bytes (this may be more then we need).
-           //code=Wire.read();                             //the first byte is the response code, we read this separately.  
+   serial_event=0;                                 //reset the serial event flag.
+   dataString2 += ",";
+   dataString2 += String(pH_data);
+   Wire.beginTransmission(DO_address);             //call the circuit by its ID number.  
+   Wire.write('r');
+   Wire.endTransmission();                         //end the I2C data transmission. 
+   delay(time_);                                   //wait the correct amount of time for the circuit to complete its instruction. 
+   Wire.requestFrom(DO_address,20,1);              //call the circuit and request 20 bytes (this may be more then we need).
+   //code=Wire.read();                             //the first byte is the response code, we read this separately.  
 
-           while(Wire.available())                         //are there bytes to receive. 
-              {  
-               in_char = Wire.read();                      //receive a byte.
-               if ((in_char > 31) && (in_char <127))        //check if the char is usable (printable)
-                  {  DO_data[i]= in_char;                         //load this byte into our array.
-                     //Serial.println(in_char);  
-                     i+=1;                                              //incur the counter for the array element. 
-                  }
-                if(in_char==0)
-                    {                                        //if we see that we have been sent a null command. 
-                        i=0;                                 //reset the counter i to 0.
-                        Wire.endTransmission();              //end the I2C data transmission.
-                        break;                               //exit the while loop.
-                    } 
-              }
-  
-          //String DO_data = String(DO_data);
-          //DO_data.trim();
-          //Serial.println(DO_data);                //print the data.
-          serial_event=0;                         //reset the serial event flag.
-                    
-            
-          //Serial.println(pH_data);
-          pH_float = atof (pH_data); 
-          //Serial.println("Convert to number, pH:");          //print the data.
-          //Serial.println(pH_float);          //print the data.  
-          //serial_event=0;                   //reset the serial event flag.
-        
-        dataString2 += ",";
-        dataString2 += String(DO_data);
-        //Serial.println(dataString2);
-
-        
-        lcd.setCursor(0,1);
-        lcd.print("Temperature/ pH/ DO");
-        lcd.setCursor(0,2);
-        lcd.print(dataString2);
-
-        dataString += ',';
-        dataString += dataString2;
-
-        File dataFile = SD.open(logFileName, FILE_WRITE);                 // open the file. note that only one file can be open at a time, so you have to close this one before opening another.
-
-        if (dataFile)                                                    // if the file is available, write to it:
-          {
-            dataFile.println(dataString);
-            dataFile.close();
-            Serial.println(dataString);                                  // print to the serial port too:
+   while(Wire.available()){                        //are there bytes to receive. 
+       in_char = Wire.read();                      //receive a byte.
+       if ((in_char > 31) && (in_char <127)){        //check if the char is usable (printable)
+          DO_data[i]= in_char;                         //load this byte into our array.
+          i+=1;                                              //incur the counter for the array element. 
           }
+       if(in_char==0){                                        //if we see that we have been sent a null command. 
+        i=0;                                 //reset the counter i to 0.
+        Wire.endTransmission();              //end the I2C data transmission.
+        break;                               //exit the while loop.
+         } 
+        }
+    serial_event=0;                         //reset the serial event flag.
+    pH_float = atof (pH_data); 
+    dataString2 += ",";
+    dataString2 += String(DO_data);
+    lcd.setCursor(0,1);
+    lcd.print("Temperature/ pH/ DO");
+    lcd.setCursor(0,2);
+    lcd.print(dataString2);
 
-         else { Serial.println("error opening datalog file"); }          // if the file isn't open, pop up an error: 
-    
+    dataString += ',';
+    dataString += dataString2;
+    File dataFile = SD.open(logFileName, FILE_WRITE);                 // open the file. note that only one file can be open at a time, so you have to close this one before opening another.
+    if (dataFile)                                                    // if the file is available, write to it:
+      {
+        dataFile.println(dataString);
+        dataFile.close();
+        Serial.println(dataString);                                  // print to the serial port too:
+      }
+
+     else { Serial.println("error opening datalog file"); }          // if the file isn't open, pop up an error: 
+   
     lcd.setCursor(0,3);
     lcd.print("Running(x5m):");
     lcd.setCursor(15,3);
     lcd.print(id);
     id ++;                                                              // increase one ID next iteration
-
     dataString = "";
-
     delay(300000);  //delay 5 mintues = 5*60*1000 ms
     lcd.clear();
-     }
+  }
 
-  void displayTemperature(DeviceAddress deviceAddress)
-    {
+  void displayTemperature(DeviceAddress deviceAddress){
       float tempC = sensors.getTempC(deviceAddress);
       if (tempC == -127.00)
         { lcd.print("Temperature Error");}
-      else { //lcd.print("C=");
+      else {
              dataString2 = String(tempC);
-            // lcd.print(tempC);
-            // lcd2.print(tempC);
-             //lcd.print("F=");
-             //lcd.print(DallasTemperature::toFahrenheit(tempC));
             }
     }  
-     
-  
- 
