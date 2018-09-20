@@ -1,6 +1,7 @@
 /*
 Control LED intensity by a timer
 Log data via a lux sensor
+extra comment for non-progamming researcher
 By Binh Nguyen, May 13, 2016
 */
 #include <Wire.h>                                                         // Wire libary for I2C comunication
