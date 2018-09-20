@@ -240,7 +240,7 @@ void loop(){
       Serial.print("Checker - Time: ");
       Serial.println(timechecker - hour24[i]);
 */
-      if (( hour24[i]-timechecker >=0) ){  //check the location i to match the RTC time
+      if (hour24[i]-timechecker >=0){  //check the location i to match the RTC time
          /*
           Serial.print("Check Time:,");  //extra printout to Serial Monitor for debug
           Serial.print(timechecker);
@@ -334,8 +334,3 @@ void displayTemperature(DeviceAddress deviceAddress){    //For additional temper
           }
     }  
 */
-
-
-
-
-
