@@ -16,7 +16,6 @@ RTC_DS1307 rtc;
 #define OLED_RESET 4
 Adafruit_SSD1306 oled(OLED_RESET);
 
-
 #include <Adafruit_Sensor.h>                                                    // For Luminosity sensor
 #include "Adafruit_TSL2591.h"
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);                              // pass in a number for the sensor identifier (for your use later)
@@ -29,14 +28,13 @@ String dataString;
 long id = 1;                                                            //the id number to enter the log order
 
 /*
-#include <OneWire.h>
+#include <OneWire.h>         //may be helpful for check temperature, safety function
 #include <DallasTemperature.h>
 #define ONE_WIRE_BUS 9              //define the pin # for temperature probe
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
-DeviceAddress ProbeP = { 0x28, 0xC2, 0xE8, 0x37, 0x07, 0x00, 0x00, 0xBF };                                            //may be helpful for check temperature, safety function
+DeviceAddress ProbeP = { 0x28, 0xC2, 0xE8, 0x37, 0x07, 0x00, 0x00, 0xBF };  
 */ 
-
 float hour24 [] =    {0.0, 1.0, 2.0, 3.0, 4.0, 4.95,           
                       5.20, 5.45, 5.70, 5.95, 
                       6.20, 6.45, 6.70, 6.95,
@@ -54,6 +52,8 @@ float hour24 [] =    {0.0, 1.0, 2.0, 3.0, 4.0, 4.95,
                       18.20, 18.45, 18.70, 18.95,
                       19.20, 19.45, 19.70, 19.95,
                       20.0, 21.0, 22.0, 23.0, 23.5, 24.0};
+
+/*______________ CUSTOMMIZED DATA POINT TO CAPTURE WHEN LIGHT CHANGES FAST ____________*/    
                                                              //hour summer 2014
 float intensity [] = {0.00, 0.00, 0.00, 0.00, 0.00, 0.00,  //hour 0.0, 1.0, 2.0, 3.0, 4.0, 4.95,
                       0.00, 0.00, 0.00, 0.00,      //     5.20, 5.45, 5.70, 5.95,
@@ -72,192 +72,149 @@ float intensity [] = {0.00, 0.00, 0.00, 0.00, 0.00, 0.00,  //hour 0.0, 1.0, 2.0,
                       0.25, 0.21, 0.18, 0.12,     //     18.20, 18.45, 18.70, 18.95,
                       0.07, 0.04, 0.02, 0.01,     //     19.20, 19.45, 19.70, 19.95,
                       0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};       //     20.0, 21.0, 22.0, 23.0
-                      
-                        
-
-
-
-
-                      
+                                     
 float timechecker;
 int pinLED = 9;
 int pinLEDX = 10;
 
-void displaySensorDetails(void)
-          {
-            sensor_t sensor;
-            tsl.getSensor(&sensor);
-            Serial.println("------------------------------------");
-            Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-            Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-            Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-            Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" lux");
-            Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" lux");
-            Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" lux");  
-            Serial.println("------------------------------------");
-            Serial.println("");
-            delay(500);
-          }
+void configureSensor(void){
+                                                      // You can change the gain on the fly, to adapt to brighter/dimmer light situations
+    //tsl.setGain(TSL2591_GAIN_LOW);                  // 1x gain (bright light)
+    tsl.setGain(TSL2591_GAIN_MED);                    // 25x gain
+    // tsl.setGain(TSL2591_GAIN_HIGH);                // 428x gain
+                                                      // Changing the integration time gives you a longer time over which to sense light
+                                                      // longer timelines are slower, but are good in very low light situtations!
+    tsl.setTiming(TSL2591_INTEGRATIONTIME_100MS);     // shortest integration time (bright light)
+    // tsl.setTiming(TSL2591_INTEGRATIONTIME_200MS);
+    // tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
+    // tsl.setTiming(TSL2591_INTEGRATIONTIME_400MS);
+    // tsl.setTiming(TSL2591_INTEGRATIONTIME_500MS);
+    // tsl.setTiming(TSL2591_INTEGRATIONTIME_600MS);  // longest integration time (dim light)
 
-void configureSensor(void)
-      {
-                                                              // You can change the gain on the fly, to adapt to brighter/dimmer light situations
-            //tsl.setGain(TSL2591_GAIN_LOW);                  // 1x gain (bright light)
-            tsl.setGain(TSL2591_GAIN_MED);                    // 25x gain
-            // tsl.setGain(TSL2591_GAIN_HIGH);                // 428x gain
-            
-                                                              // Changing the integration time gives you a longer time over which to sense light
-                                                              // longer timelines are slower, but are good in very low light situtations!
-            tsl.setTiming(TSL2591_INTEGRATIONTIME_100MS);     // shortest integration time (bright light)
-            // tsl.setTiming(TSL2591_INTEGRATIONTIME_200MS);
-            // tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
-            // tsl.setTiming(TSL2591_INTEGRATIONTIME_400MS);
-            // tsl.setTiming(TSL2591_INTEGRATIONTIME_500MS);
-            // tsl.setTiming(TSL2591_INTEGRATIONTIME_600MS);  // longest integration time (dim light)
-          
-            /* Display the gain and integration time for reference sake */  
-            Serial.println("------------------------------------");
-            Serial.print  ("Gain:         ");
-            tsl2591Gain_t gain = tsl.getGain();
-            switch(gain)
-            {
-              case TSL2591_GAIN_LOW:
-                Serial.println("1x (Low)");
-                break;
-              case TSL2591_GAIN_MED:
-                Serial.println("25x (Medium)");
-                break;
-              case TSL2591_GAIN_HIGH:
-                Serial.println("428x (High)");
-                break;
-              case TSL2591_GAIN_MAX:
-                Serial.println("9876x (Max)");
-                break;
-            }
-            Serial.print  ("Timing:       ");
-            Serial.print((tsl.getTiming() + 1) * 100, DEC); 
-            Serial.println(" ms");
-            Serial.println("------------------------------------");
-            Serial.println("");
-      }
+    /* Display the gain and integration time for reference sake */  
+    Serial.println("------------------------------------");
+    Serial.print  ("Gain:         ");
+    tsl2591Gain_t gain = tsl.getGain();
+    switch(gain){
+      case TSL2591_GAIN_LOW:
+        Serial.println("1x (Low)");
+        break;
+      case TSL2591_GAIN_MED:
+        Serial.println("25x (Medium)");
+        break;
+      case TSL2591_GAIN_HIGH:
+        Serial.println("428x (High)");
+        break;
+      case TSL2591_GAIN_MAX:
+        Serial.println("9876x (Max)");
+        break;
+    }
+    Serial.print  ("Timing:       ");
+    Serial.print((tsl.getTiming() + 1) * 100, DEC); 
+    Serial.println(" ms");
+    Serial.println("------------------------------------");
+    Serial.println("");
+}
 
-
-void advancedRead(void)
-      {
-            // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
+void advancedRead(void) {
+  // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
             // That way you can do whatever math and comparisons you want!
-            uint32_t lum = tsl.getFullLuminosity();
-            uint16_t ir, full;
-            ir = lum >> 16;
-            full = lum & 0xFFFF;
+  uint32_t lum = tsl.getFullLuminosity();
+  uint16_t ir, full;
+  ir = lum >> 16;
+  full = lum & 0xFFFF;
 
-            long vis = full - ir;
-            long lux = tsl.calculateLux(full, ir);
-            lux2 = lux;
-            dataString += String(ir)+",";
-            dataString += String(vis)+",";
-            dataString += String(lux) +",";
-            
-            Serial.print("[ "); Serial.print(millis()); Serial.print(" ms ] ");
-            Serial.print("IR: "); Serial.print(ir);  Serial.print("  ");
-            Serial.print("Full: "); Serial.print(full); Serial.print("  ");
-            Serial.print("Visible: "); Serial.print(full - ir); Serial.print("  ");
-            Serial.print("Lux: "); Serial.println(tsl.calculateLux(full, ir));
-      }
-void unifiedSensorAPIRead(void)
-      {        
-            sensors_event_t event;                                                                 // Get a new sensor event
-            tsl.getEvent(&event);
-            //Serial.print("[ "); Serial.print(event.timestamp); Serial.print(" ms ] ");           // Display the results (light is measured in lux)
-            if ((event.light == 0) |
-                (event.light > 4294966000.0) | 
-                (event.light <-4294966000.0))
-              {
-                Serial.println("Invalid data (adjust gain or timing)");                            // If event.light = 0 lux the sensor is probably saturated
-                                                                                                   // and no reliable data could be generated! 
-                                                                                                   // if event.light is +/- 4294967040 there was a float over/underflow 
-              }
-            else
-              { Serial.print(event.light); Serial.println(" lux");}
-      }
+  long vis = full - ir;
+  long lux = tsl.calculateLux(full, ir);
+  lux2 = lux;
+  dataString += String(ir)+",";
+  dataString += String(vis)+",";
+  dataString += String(lux) +",";
 
-                                                      
-void setup() 
-  {
+  Serial.print("[ "); Serial.print(millis()); Serial.print(" ms ] ");
+  Serial.print("IR: "); Serial.print(ir);  Serial.print("  ");
+  Serial.print("Full: "); Serial.print(full); Serial.print("  ");
+  Serial.print("Visible: "); Serial.print(full - ir); Serial.print("  ");
+  Serial.print("Lux: "); Serial.println(tsl.calculateLux(full, ir));
+}
+void unifiedSensorAPIRead(void){
   
-     Serial.begin(9600);                                                                           // Start Serial commnication
-     
-     pinMode(pinLED, OUTPUT);
-     pinMode(pinLEDX, OUTPUT);
-                                
-     Serial.print("RTC is...");   
-      if (! rtc.begin())
-          { 
-           Serial.println("RTC:  Real-time clock...NOT FOUND");
-           while (1);// (Serial.println("RTC:  Real-time clock...FOUND"));
-          }
-     Serial.println("RUNNING");
+  sensors_event_t event;                                                                 // Get a new sensor event
+  tsl.getEvent(&event);
+  //Serial.print("[ "); Serial.print(event.timestamp); Serial.print(" ms ] ");           // Display the results (light is measured in lux)
+  if ((event.light == 0) |
+      (event.light > 4294966000.0) | 
+      (event.light <-4294966000.0)){
+      Serial.println("Invalid data (adjust gain or timing)");                            // If event.light = 0 lux the sensor is probably saturated
+  }                                                                                  // and no reliable data could be generated! 
+                                                                                         // if event.light is +/- 4294967040 there was a float over/underflow 
+  else{ Serial.print(event.light); Serial.println(" lux");}
+}
 
-       
-     Serial.print("Real-time Clock...");
-       if (! rtc.isrunning())
-            {rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-            }
-     Serial.println("WORKING");
-           
-           
-       Serial.print("SD card...");                                                             // see if the card is present and can be initialized:
-      if (!SD.begin(chipSelect)) 
-          {  Serial.println("Failed");                                                         // don't do anything more:
-             return;
-          }
-      Serial.println("OK");
-
-     Serial.print("Log File: ");
-       Serial.print(logFileName);
-       Serial.print("...");
-       File logFile = SD.open(logFileName, FILE_WRITE);                                       // open the file. "datalog" and print the header
-        if (logFile)
-          {
-            logFile.println(", , , , , , ");                                                  //indicate there were data in the previous run
-            String header = "ID, Date Time, TimeCheck, % Ouput, IR, VIS, Lux";
-            logFile.println(header);
-            logFile.close();
-            Serial.println("READY");
-          }
-      else { Serial.println("error opening datalog"); }                                        // if the file isn't open, pop up an error:
-
-     if (tsl.begin())                                                                          // Display some basic information on this sensor 
-        { Serial.println("Found a TSL2591 sensor");} 
-      else 
-        { Serial.println("No sensor found ... check your wiring?");
-          while (1);
+void setup(){
+   Serial.begin(9600);                                                                           // Start Serial commnication
+   pinMode(pinLED, OUTPUT);
+   pinMode(pinLEDX, OUTPUT);
+   Serial.print("RTC is...");   
+    if (! rtc.begin()){ 
+         Serial.println("RTC:  Real-time clock...NOT FOUND");
+         while (1);// (Serial.println("RTC:  Real-time clock...FOUND"));
         }
-    displaySensorDetails();                                                                     // Display some basic information on this sensor 
-    configureSensor();           
-      
-       
-         
-         // Setup OLED display
-            oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-            oled.clearDisplay();
-            delay(1000);
-            oled.setTextSize(1);
-            oled.setTextColor(WHITE);
-            oled.setCursor(0,0);
-            oled.println("Welcome...");
-            oled.println("Light Control");
-            oled.println("SD Card READY");
-            oled.println("CLOCK READY");
-            oled.println("LogFile READY");
-            oled.display();
-            oled.clearDisplay();
-            id = 1;
-            delay(4000);
-   }
+   Serial.println("RUNNING");
 
-void loop() 
-  { 
+   Serial.print("Real-time Clock...");
+     if (! rtc.isrunning()){
+       rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+          }
+   Serial.println("WORKING");
+
+    Serial.print("SD card...");                                                             // see if the card is present and can be initialized:
+    if (!SD.begin(chipSelect)){
+      Serial.println("Failed");                                                         // don't do anything more:
+      return;
+        }
+    Serial.println("OK");
+
+   Serial.print("Log File: ");
+   Serial.print(logFileName);
+   Serial.print("...");
+   File logFile = SD.open(logFileName, FILE_WRITE);                                       // open the file. "datalog" and print the header
+   if (logFile){
+     logFile.println(", , , , , , ");                                                  //indicate there were data in the previous run
+     String header = "ID, Date Time, TimeCheck, % Ouput, IR, VIS, Lux";
+     logFile.println(header);
+     logFile.close();
+     Serial.println("READY");
+    } else { 
+     Serial.println("error opening datalog");                                         // if the file isn't open, pop up an error:
+   }
+   if (tsl.begin()){                                                                          // Display some basic information on this sensor 
+      Serial.println("Found a TSL2591 sensor");
+   } else { Serial.println("No sensor found ... check your wiring?");
+        while (1);
+   }
+  displaySensorDetails();                                                                     // Display some basic information on this sensor 
+  configureSensor();           
+      
+ // Setup OLED display
+  oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  oled.clearDisplay();
+  delay(1000);
+  oled.setTextSize(1);
+  oled.setTextColor(WHITE);
+  oled.setCursor(0,0);
+  oled.println("Welcome...");
+  oled.println("Light Control");
+  oled.println("SD Card READY");
+  oled.println("CLOCK READY");
+  oled.println("LogFile READY");
+  oled.display();
+  oled.clearDisplay();
+  id = 1;
+  delay(4000);
+}
+
+void loop(){ 
 
    dataString = String(id);
    dataString += String(',');    
@@ -265,51 +222,43 @@ void loop()
     DateTime now = rtc.now();
     int houR = (int)now.hour();
     float minutE = (float)now.minute();
-    
+/*______________ CHECK TIME, CONVERT TO FLOAT AND COMPARE WITH DEFINDED PROFILE ____________*/    
     timechecker = houR + minutE/60;
     //Serial.print("Minutes/60, ");
     //Serial.println(minutE/60);
     float record;
     int locator;
-    for (int i=0; i<100; i ++)
-        {
-              /*
-              Serial.print("i: ");
-              Serial.print(i);
-              Serial.print(", hour24[i]: ");
-              Serial.print(hour24[i]);
-              Serial.print(", Intensity[i]: ");
-              Serial.print(intensity[i]);
-              Serial.print("Checker - Time: ");
-              Serial.println(timechecker - hour24[i]);
-              */
-              
-              if (( hour24[i]-timechecker >=0) )
-                {
-                     /*
-                      Serial.print("Check Time:,");
-                      Serial.print(timechecker);
-                      Serial.print(",");
-                      Serial.print("hour24[i], ");
-                      Serial.print(hour24[i]);
-                      Serial.print(",");
-
-                      delay(1000);
-                      locator = i;
-                      */
-
-                      record = intensity[i];
-                      //Serial.print("TimeCheck : hour24: ");
-                      //float delta = timechecker - hour24[i];
-                     // Serial.print("i:");
-                      //Serial.print(hour24[i]);
-                     // Serial.print("< Timecheck - hour24[i+1]");
-                      //Serial.println(timechecker - hour24[i+1]);
-                      
-                      break;
-                      
-                }
-                                
+    for (int i=0; i<100; i ++){
+      /*
+      Serial.print("i: ");
+      Serial.print(i);
+      Serial.print(", hour24[i]: ");
+      Serial.print(hour24[i]);
+      Serial.print(", Intensity[i]: ");
+      Serial.print(intensity[i]);
+      Serial.print("Checker - Time: ");
+      Serial.println(timechecker - hour24[i]);
+*/
+      if (( hour24[i]-timechecker >=0) ){  //check the location i to match the RTC time
+         /*
+          Serial.print("Check Time:,");  //extra printout to Serial Monitor for debug
+          Serial.print(timechecker);
+          Serial.print(",");
+          Serial.print("hour24[i], ");
+          Serial.print(hour24[i]);
+          Serial.print(",");
+          delay(1000);
+          locator = i;
+          */
+          record = intensity[i];
+          break;                //exit the loop with the first instace (lot of headache happeneded here)
+//           Serial.print("TimeCheck : hour24: ");
+//           float delta = timechecker - hour24[i];
+//           Serial.print("i:");
+//           Serial.print(hour24[i]);
+//           Serial.print("< Timecheck - hour24[i+1]");
+//           Serial.println(timechecker - hour24[i+1]);           
+         }                         
         }
      Serial.print("Locator:");
      Serial.println(locator);
@@ -322,7 +271,7 @@ void loop()
      //delay(2000);
      //Serial.println("Hardcode");
      //analogWrite(pinLED, 150);
-    
+/*______________ PREPARE AND RECORD DATA ____________*/    
     String datE = String(now.year(), DEC);
     datE += "/";
     datE += String(now.month(), DEC);
@@ -355,46 +304,33 @@ void loop()
     oled.println(" lux");
     oled.display();
    // Serial.print("Lux record: ");
-    //Serial.println(lux2);
-
-    
+   //Serial.println(lux2);
  // Serial.println(dataString);
     File dataFile = SD.open(logFileName, FILE_WRITE);                         // open the file. note that only one file can be open at a time, so you have to close this one before opening another.
-
-        if (dataFile)                                                         // if the file is available, write to it:
-          {
-            dataFile.println(dataString);
-            dataFile.close();
-            Serial.print("Recording: ");
-            Serial.println(dataString);                                        // print to the serial port too:
-          }
-
-         else { Serial.println("error opening datalog file"); }                // if the file isn't open, pop up an error: 
-    
+    if (dataFile){                                                         // if the file is available, write to it:
+        dataFile.println(dataString);
+        dataFile.close();
+        Serial.print("Recording: ");
+        Serial.println(dataString);                                        // print to the serial port too:
+      }else { Serial.println("error opening datalog file"); }                // if the file isn't open, pop up an error: 
     oled.clearDisplay();
     //Serial.println(id);
     delay(300000);   //delay for 5 minutes
-
     id ++;
     dataString = "";
-
   }
-
-
-
 /*
-void displayTemperature(DeviceAddress deviceAddress)
-    {
-      float tempC = sensors.getTempC(deviceAddress);
-      if (tempC == -127.00)
-        { lcd.print("Temperature Error");}
-      else { //lcd.print("C=");
-             dataString = String(tempC);
-            // lcd.print(tempC);
-            // lcd2.print(tempC);
-             //lcd.print("F=");
-             //lcd.print(DallasTemperature::toFahrenheit(tempC));
-            }
+void displayTemperature(DeviceAddress deviceAddress){    //For additional temperature probe
+    float tempC = sensors.getTempC(deviceAddress);
+    if (tempC == -127.00)
+      { lcd.print("Temperature Error");}
+    else { //lcd.print("C=");
+           dataString = String(tempC);
+          // lcd.print(tempC);
+          // lcd2.print(tempC);
+           //lcd.print("F=");
+           //lcd.print(DallasTemperature::toFahrenheit(tempC));
+          }
     }  
 */
 
