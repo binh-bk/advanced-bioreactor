@@ -13,30 +13,30 @@ the components and codes were built for an algae cultivation vessel using inorga
 ### 1. LED Control and Lux Measurement
 
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/LED_Control_0513/LED%20control.jpg"/>
+  <img src="LED_Control_0513/LED%20control.jpg"/>
 </p>
 
 ### 2.  Data Logger
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/Logging_ph_DO_temp_sentdata_I2C_0426/data%20logger_pH_temp_DO.jpg"/>
+  <img src="Logging_ph_DO_temp_sentdata_I2C_0426/data%20logger_pH_temp_DO.jpg"/>
 </p>
 
 
 ### 3.  Turbidity monitoring and control
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/Turbidity_logdata_YunShield_0726/turbidostat.png"/>
+  <img src="Turbidity_logdata_YunShield_0726/turbidostat.png"/>
 </p>
 
 ### 4. Turbidity and logging data via USB cable
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/Turbidity_log_python/simpleTurbidostat.jpg"/>
+  <img src="Turbidity_log_python/simpleTurbidostat.jpg"/>
 </p>
 
 ### 5. Simulation of algae growing batch
 #### Noted as v1.0 inside the //simulation// folder
 Below are two-day simulation, running ~2880 steps in 0.01 secs
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v1.0/3%20days%2C%20high%20X.png"/>
+  <img src="simulation/v1.0/3%20days%2C%20high%20X.png"/>
 </p>
 
 ### 6. Complete simulation of microalgae growth:
@@ -50,12 +50,12 @@ Below are two-day simulation, running ~2880 steps in 0.01 secs
     + A self-generated .csv file stores the biomass productivivity (g/m2-day)
 #### Print out in the terminal
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v2.1/v2.1_025.png"/>
+  <img src="simulation/v2.1/v2.1_025.png"/>
 </p>
 
 #### An example of the graph output
 <p align="center">
-  <img src="https://github.com/binh-bk/advanced-bioreactor/blob/master/simulation/v2.1/20180805-w.500.0.05.0.3.png"/>
+  <img src="simulation/v2.1/20180805-w.500.0.05.0.3.png"/>
 </p>
 
 =======
